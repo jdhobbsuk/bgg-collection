@@ -5,17 +5,17 @@
  * and registers the activation and deactivation functions.
  *
  * @link              http://github.com/mixd
- * @author            Mixd
+ * @author            thecodezombie
  * @version           1.0.0
- * @package           mixd-wp-demo
+ * @package           bgg-collection
  *
  * @wordpress-plugin
- * Plugin Name:       Demo Plugin
+ * Plugin Name:       BGG Collection
  * Plugin URI:        https://github.com/mixd
  * Description:       This is an example of a WordPress Plugin
  * Version:           1.0.0
- * Author:            Mixd
- * Author URI:        http://www.mixd.co.uk
+ * Author:            thecodezombie
+ * Author URI:        http://thecodezombie.co.uk
  * License:           GPLv3
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain:       mixd-wp-demo

@@ -5,7 +5,7 @@
  * - Adds a Page into WordPress Admin sidebar
  * - Enqueues Mixd plugin stylesheet (sidebar icon)
  *
- * @author      Mixd
+ * @author      thecodezombie
  * @version     1.0.0
  *
  */
