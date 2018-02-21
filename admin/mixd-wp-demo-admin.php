@@ -15,16 +15,16 @@
  *
  * @since 1.0.0
  */
-function mixd_wp_demo_add_caps() {
+function bgg_collection_add_caps() {
     
     $role = get_role('administrator');
-    $role->add_cap('mixd_wp_demo_config');
+    $role->add_cap('bgg_collection');
     
     $role = get_role('editor');
-    $role->add_cap('mixd_wp_demo_config');
+    $role->add_cap('bgg_collection');
 }
 
-add_action( 'admin_init', 'mixd_wp_demo_add_caps' );
+add_action( 'admin_init', 'bgg_collection_add_caps' );
 
 
 
@@ -33,20 +33,19 @@ add_action( 'admin_init', 'mixd_wp_demo_add_caps' );
  *
  * @since 1.0.0
  */
-function mixd_wp_demo_options_page() {
-    
-    add_submenu_page(
-        'mixd-wp-plugins',              // $parent_slug
-        'Mixd Plugins: Demo Plugin',    // $page_title
-        'Demo Plugin',                  // $menu_title
-        'mixd_wp_demo_config',          // $capability
-        'mixd_wp_demo_options',         // $menu_slug
-        'mixd_wp_demo_options'          // $callback
-    );
+function bgg_collection_options_page() {
+
+    add_options_page( 'Boardgamegeek Collection', 'BGG Collection', 'manage_options', 'bgg-collection', 'bgg_collection_options' );
 
 }
 
-add_action( 'admin_menu', 'mixd_wp_demo_options_page' );
+add_action( 'admin_menu', 'bgg_collection_options_page' );
+
+add_action( 'admin_init', 'bgg_collection_settings' );
+
+function bgg_collection_settings() {
+    register_setting( 'bgg_collection_settings', 'bgg_username' );
+}
 
 
 
@@ -55,6 +54,6 @@ add_action( 'admin_menu', 'mixd_wp_demo_options_page' );
  *
  * @since 1.0.0
  */
-function mixd_wp_demo_options() {
+function bgg_collection_options() {
     require_once( plugin_dir_path( __FILE__ ) . 'mixd-wp-demo-options.php' );
 }

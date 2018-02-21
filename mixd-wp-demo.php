@@ -45,8 +45,8 @@ require_once( 'mixd-wp-foundation.php' );
  * @since 1.0.0
  * @return string
  */
-function mixd_wp_demo_title() {
-    return __("Mixd's demo Plugin for WordPress", "mixd-wp-demo");
+function bgg_collection_title() {
+    return __("Boardgamegeek Collection", "bgg-collection");
 }
 
 
@@ -57,8 +57,8 @@ function mixd_wp_demo_title() {
  * @since 1.0.0
  * @return string
  */
-function mixd_wp_demo_description() {
-    return __("This is a short description about how to use this plugin", "mixd-wp-demo");
+function bgg_collection_description() {
+    return __("This is a short description about how to use this plugin", "bgg-collection");
 }
 
 
