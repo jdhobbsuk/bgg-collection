@@ -1,13 +1,13 @@
 <section id="introduction" class="wrap about-description">
 
     <h1><?php echo bgg_collection_title(); ?></h1>
-    <p><?php echo bgg_collection_description(); ?></p>
+    <!-- <p><?php //echo bgg_collection_description(); ?></p> -->
 
     <?php
     	$username = (get_option('bgg_username')) ? sanitize_text_field( get_option('bgg_username') ) : '';
     	$sync     = ( isset($_GET['sync']) ) ? true : false ;
 
-    	$bgg_url  = 'https://www.boardgamegeek.com/xmlapi2/collection?username='.$username;
+    	$bgg_url  = 'https://www.boardgamegeek.com/xmlapi2/collection?username='.$username.'&stats=1';
     	$page     = get_current_screen();
     	$sync_url = admin_url($page->parent_file.'?page=bgg-collection&sync=1' );
 

@@ -35,7 +35,7 @@ if ( !defined( 'WPINC' ) ) { die; }
  *
  * @since 1.0.0
  */
-require_once( 'mixd-wp-foundation.php' );
+require_once( 'bgg_collection-foundation.php' );
 
 
 

@@ -55,5 +55,5 @@ function bgg_collection_settings() {
  * @since 1.0.0
  */
 function bgg_collection_options() {
-    require_once( plugin_dir_path( __FILE__ ) . 'mixd-wp-demo-options.php' );
+    require_once( plugin_dir_path( __FILE__ ) . 'options.php' );
 }
