@@ -10,17 +10,26 @@ $bgg_url  = 'https://www.boardgamegeek.com/xmlapi2/collection?username='.$userna
 $xml = simplexml_load_file( $bgg_url );
 
 // set defaults
-$avg_rating = '';
-$per_rating = '';
-$min_player = '';
-$max_player = '';
+$avg_rating  = '';
+$per_rating  = '';
+$min_player  = '';
+$max_player  = '';
+$playingtime = '';
 
 if( !empty( $xml ) ):
 
     foreach( $xml as $item ):
-        $bgg_id = intval( $item['objectid']->__toString() );
-        $title  = $item->name[0]->__toString();
-        $image  = $item->image[0]->__toString();
+        global $wpdb;
+
+        echo '<pre>';
+        print_r($item);
+        echo '</pre>';
+
+        // basics
+        $bgg_id         = intval( $item['objectid']->__toString() );
+        $title          = $item->name[0]->__toString();
+        $image          = $item->image[0]->__toString();
+        $year_published = $item->yearpublished[0]->__toString();
         
         // if stats are accessible
         if( !empty($item->stats) ):
@@ -32,15 +41,20 @@ if( !empty( $xml ) ):
             $max_player = intval( $item->stats['maxplayers'][0]->__toString() );
 
             $playingtime = intval( $item->stats['playingtime']->__toString() );
+
+            $ranks = $item->stats->rating->ranks;
+
+            // get BGG rank from array
+            if( !empty($ranks) ):
+                foreach($ranks as $rank):
+                    if($rank->rank['id']->__toString() == 1):
+                        $rank = intval( $rank->rank['value']->__toString() );
+                    endif;
+                endforeach;
+            endif;
         endif;
 
-
-        echo '<pre>';
-        print_r( $item );
-        echo '</pre>';
-
-        global $wpdb;
-
+        // check for existing posts using BGG ID
         $exist_check = $wpdb->get_results("SELECT * FROM $wpdb->postmeta WHERE meta_key = 'bgg_id' AND meta_value = ".$bgg_id." LIMIT 1", ARRAY_A);
 
         // generate player terms
@@ -50,7 +64,7 @@ if( !empty( $xml ) ):
             for($i = $min_player; $i <= $max_player; $i++):
                 $term_check = term_exists( $i, 'players' );
 
-                if( $term_check === 0 && $term_check === null ):
+                if( $term_check === 0 || $term_check === NULL ):
                     $title = $i.' Players';
                     if( $i == 1 ):
                         $title = 'Solo'; 
@@ -67,6 +81,18 @@ if( !empty( $xml ) ):
             endfor;
         endif;
 
+        // generate years published
+        if( $year_published ):
+            $year_check = term_exists( $year_published, 'published' );
+            if( $year_check === 0 || $year_check === NULL ):
+                $args = array(
+                    'slug' => $year_published
+                );
+                wp_insert_term( $year_published, 'published', $args );
+            endif;
+        endif;
+
+        // create post, or if exists then update instead
         if( empty($exist_check) ):
             $new_post = array(
                 'post_title' => $title,
@@ -89,8 +115,13 @@ if( !empty( $xml ) ):
                 endif;
 
                 // playing time
-                if( playingtime ):
+                if( $playingtime ):
                     add_post_meta($post_id, 'playingtime', $playingtime);
+                endif;
+
+                // BGG rank
+                if( $rank ):
+                    add_post_meta($post_id, 'rank', $rank);
                 endif;
         else:
 
@@ -113,14 +144,24 @@ if( !empty( $xml ) ):
                 endif;
 
                 // playing time
-                if( playingtime ):
+                if( $playingtime ):
                     update_post_meta($post_id, 'playingtime', $playingtime);
+                endif;
+
+                // BGG rank
+                if( $rank ):
+                    update_post_meta($post_id, 'rank', $rank);
                 endif;
         endif;
 
         // add player choices
         if( !empty($players) ):
             wp_set_object_terms( $post_id, $players, 'players' );
+        endif;
+
+        // add year published
+        if( $year_published ):
+            wp_set_object_terms( $post_id, $year_published, 'published' );
         endif;
 
     endforeach;

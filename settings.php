@@ -89,9 +89,47 @@ function bgg_collection_players_taxonomy () {
 
 add_action('init', 'bgg_collection_players_taxonomy');
 
+/**
+ * Registers the 'published' taxonomy
+ *
+ * @since 1.0.0
+ */
+function bgg_collection_published_taxonomy () {
+    $singular = 'Year';
+    $plural   = 'Years';
+
+    register_taxonomy(
+        'published',
+        array( 'collection' ),
+        array(
+            'labels' => array(
+                'name' => __( $plural ),
+                'singular_name' => __( $singular ),
+                'search_items' => __( 'Search '.$plural ),
+                'popular_items' => __( 'Popular '.$plural ),
+                'all_items' => __( 'All '.$plural ),
+                'parent_item' => __( 'Parent '.$singular ),
+                'parent_item_colon' => __( 'Parent '.$singular.':' ),
+                'edit_item' => __( 'Edit '.$singular ),
+                'update_item' => __( 'Update '.$singular ),
+                'add_new_item' => __( 'Add New '.$singular ),
+                'new_item_name' => __( 'New '.$singular ),
+            ),
+            'public' => true,
+            'show_in_nav_menus' => true,
+            'show_ui' => true,
+            'hierarchical' => true,
+            'query_var' => true,
+            'rewrite' => array( 'slug' => 'published', 'with_front' => false ),
+        )
+    );
+}
+
+add_action('init', 'bgg_collection_published_taxonomy');
+
 
 /**
- * Registers the 'players' taxonomy
+ * Orders games alphabetically
  *
  * @since 1.0.0
  */
@@ -117,12 +155,14 @@ add_filter( 'pre_get_posts', 'bgg_collection_admin_order' );
  */
 function bgg_collection_define_columns( $columns ) {
 
-    $columns['cb']            = '<input type="checkbox" />';
-    $columns['avg_rating']    = __('Rating (Avg)');
-    $columns['per_rating']    = __('Rating (Personal)');
-    $columns['playingtime']    = __('Playing Time (mins)');
-    $columns['players']       = __('Players');
-    $columns['bgg_link']    = __('BGG Link');
+    $columns['cb']          = '<input type="checkbox" />';
+    $columns['year']        = __('<span style="font-size: 85%"><i class="dashicons dashicons-calendar-alt"></i> Published</span>');
+    $columns['avg_rating']  = __('<span style="font-size: 85%">Rating (Avg)</span>');
+    $columns['per_rating']  = __('<span style="font-size: 85%">Rating (Personal)</span>');
+    $columns['rank']        = __('<span style="font-size: 85%">Rank</span>');
+    $columns['playingtime'] = __('<span style="font-size: 85%"><i class="dashicons dashicons-clock"></i> Length (mins)</span>');
+    $columns['players']     = __('<span style="font-size: 85%"><i class="dashicons dashicons-admin-users"></i> Players</span>');
+    $columns['bgg_link']    = __('<span style="font-size: 85%">BGG Link</span>');
     unset($columns['date']);
 
     return $columns;
@@ -161,6 +201,12 @@ function bgg_collection_fill_columns( $column_name, $id ) {
 
             echo $playingtime;
         break;
+        case 'rank':
+
+            $rank = get_post_meta($post->ID, 'rank', true);
+
+            echo $rank;
+        break;
         case 'bgg_link':
 
             $bgg_id = get_post_meta($post->ID, 'bgg_id', true);
@@ -169,6 +215,11 @@ function bgg_collection_fill_columns( $column_name, $id ) {
                 $href = 'href="'.$url.$bgg_id.'"';
                 echo '<a '.$href.' target="_blank"><i class="dashicons dashicons-admin-links">&nbsp;</i></a>';
             endif;
+        break;
+        case 'year':
+
+            $published = get_the_term_list( $post->ID, 'published', '<ul style="margin: 0;"><li>', '</li><li>', '</li></ul>' );
+            echo strip_tags( $published, '<ul> <li>' );
         break;
         case 'players':
 
