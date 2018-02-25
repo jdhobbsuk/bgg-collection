@@ -10,7 +10,7 @@
  * @package           bgg-collection
  *
  * @wordpress-plugin
- * Plugin Name:       BGG Collection
+ * Plugin Name:       BoardGameGeek Collection
  * Plugin URI:        https://github.com/mixd
  * Description:       Import a user's boardgame collection from boardgamegeek.com
  * Version:           1.0.0

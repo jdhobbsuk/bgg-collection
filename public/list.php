@@ -15,65 +15,94 @@ $collection = bgg_collection_get_games();
 ?>
 
 <?php if( $collection->have_posts() ): ?>
-	<div class="">
-        	<?php while ( $collection->have_posts() ): $collection->the_post(); ?>
-        		<?php
-        			$id = get_the_ID();
+	<div class="bgg-list" id="list">
+    	<?php while ( $collection->have_posts() ): $collection->the_post(); ?>
+    		<?php
+    			$id = get_the_ID();
+    			$content = get_the_content();
 
+    			// logic to choose appropriate link
+    			if( $content != '' ):
+    				$title = '<a href="'.get_permalink().'">'.get_the_title().'</a>';
+    			else:
         			$bgg_id = get_post_meta($id, 'bgg_id', true);
 		            if($bgg_id):
+
 		                $url   = 'https://boardgamegeek.com/boardgame/';
 		                $href  = 'href="'.$url.$bgg_id.'"';
 		                $title = '<a '.$href.' target="_blank">'.get_the_title().'</a>';
 		            else:
 		            	$title = get_the_title();
 		            endif;
+		        endif;
 
-		            // meta
-					$meta_arr    = array();
+	            // meta
+	            $meta_arr = bgg_collection_create_meta( $id );
+    		?>
 
-					$avg_rating  = get_post_meta($id, 'avg_rating', true);
-					if( $avg_rating ):
-						$meta_arr[] = array( 'label' => 'Rating (Average)', 'value' => number_format($avg_rating, 1) );
-					endif;
-
-					$per_rating  = get_post_meta($id, 'per_rating', true);
-					if( !$per_rating ):
-						$per_rating = 'N/A';
-					endif;
-					$meta_arr[] = array( 'label' => 'Rating (Personal)', 'value' => $per_rating );
-
-					$rank  = get_post_meta($id, 'rank', true);
-					if( $rank ):
-						$meta_arr[] = array( 'label' => 'BGG Rank', 'value' => $rank );
-					endif;
-
-					$playingtime = get_post_meta($id, 'playingtime', true);
-					if( $playingtime ):
-						$meta_arr[] = array( 'label' => 'Length (mins)', 'value' => $playingtime );
-					endif;
-        		?>
-
-        		<article>
-        			<header>
-	            		<h2><?php echo $title; ?></h2>
-	            	</header>
-	            	<?php
-	            		if( !empty($meta_arr) ):
-	            			echo '<dl>';
-	            				foreach($meta_arr as $meta):
-	            					echo '<div>';
-	            						echo '<dt>'.$meta['label'].'</dt>';
-	            						echo '<dd>'.$meta['value'].'</dd>';
-	            					echo '</div>';
-	            				endforeach;
-	            			echo '</dl>';
-	            		endif;
-	            	?>
-
-	            	<hr />
-	            </article>
-            <?php endwhile; ?>
-        </div>
+    		<article class="bgg-item">
+    			<header class="bgg-item__header">
+            		<h2 class="bgg-item__title"><?php echo $title; ?></h2>
+            	</header>
+            	<?php
+            		if( !empty($meta_arr) ):
+            			echo '<dl class="bgg-item__meta">';
+            				foreach($meta_arr as $meta):
+            					echo '<div>';
+            						echo '<dt>'.$meta['label'].'</dt>';
+            						echo '<dd>'.$meta['value'].'</dd>';
+            					echo '</div>';
+            				endforeach;
+            			echo '</dl>';
+            		endif;
+            	?>
+            </article>
+        <?php endwhile; ?>
 	</div>
 <?php endif; wp_reset_query(); ?>
+
+<?php
+    $found_posts = $collection->found_posts;
+    $ppp = $layout_choices["{$bgg_prefix}_ppp"];
+
+    $total_pages = ceil($found_posts / $ppp);
+    $page = (isset($_GET['filter_page'])) ? $_GET['filter_page'] : '1';
+?>
+
+<?php if ( $total_pages > 1 ) : ?>
+
+    <nav class="pagination">
+
+        <?php // Previous Page Results ?>
+        <div class="pagination__prev">
+            <?php if ($page == 1): ?>
+                <span>Previous</span>
+            <?php else: ?>
+                <a href="<?php echo esc_url( add_query_arg( 'filter_page', $page-1 ) ); ?>#list">Previous</a>
+            <?php endif; ?>
+        </div>
+
+        <?php // Pagination ?>
+        <?php if ( $total_pages > 1 ) : ?>
+            <ul class="pagination__pages">
+                <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                    <?php if($page == $i): ?>
+                        <li><span class="btn btn--white btn--flush"><?php echo $i; ?></span></li>
+                    <?php else: ?>
+                        <li><a class="btn btn--white btn--flush" href="<?php echo esc_url( add_query_arg( 'filter_page', $i ) ); ?>#list"><?php echo $i; ?></a></li>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </ul>
+        <?php endif; ?>
+
+        <?php // Next Results Page ?>
+        <div class="pagination__next">
+            <?php if ($page < $total_pages): ?>
+                <a href="<?php echo esc_url( add_query_arg( 'filter_page', $page+1 ) ); ?>#list">Next</a>
+            <?php else: ?>
+                <span>Next</span>
+            <?php endif; ?>
+        </div>
+    </nav>
+
+<?php endif; ?>
