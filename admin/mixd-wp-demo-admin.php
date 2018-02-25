@@ -38,14 +38,34 @@ function bgg_collection_options_page() {
     add_options_page( 'Boardgamegeek Collection', 'BGG Collection', 'manage_options', 'bgg-collection', 'bgg_collection_options' );
 
 }
-
 add_action( 'admin_menu', 'bgg_collection_options_page' );
 
-add_action( 'admin_init', 'bgg_collection_settings' );
-
 function bgg_collection_settings() {
-    register_setting( 'bgg_collection_settings', 'bgg_username' );
+	$bgg_prefix = wp_cache_get('bgg_prefix');
+
+	// data import choices
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_rating_avg", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_rating_per", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_rank", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_length", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_player", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_data_year", array( 'default', 'on' ) );
+
+	// data filter choices
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_filter_rating_avg", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_filter_length", array( 'default', 'on' ) );
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_filter_player", array( 'default', 'on' ) );
+
+	// data layout choices
+	register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_root" );
+    register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_ppp", array( 'default', 0 ) );
+    register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_css", array( 'default', 'on' ) );
+
+    // BGG settings
+    register_setting( "{$bgg_prefix}_settings", "{$bgg_prefix}_username" );
+
 }
+add_action( 'admin_init', 'bgg_collection_settings' );
 
 
 

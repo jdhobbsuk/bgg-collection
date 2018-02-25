@@ -12,6 +12,7 @@
  *
  * @since 1.0.0
  */
+
 function bgg_collection_games_cpt () {
     $singular = 'Game';
     $plural   = 'Games';
@@ -46,6 +47,7 @@ function bgg_collection_games_cpt () {
             )
         )
     );
+
 }
 
 add_action('init', 'bgg_collection_games_cpt');
@@ -57,34 +59,41 @@ add_action('init', 'bgg_collection_games_cpt');
  * @since 1.0.0
  */
 function bgg_collection_players_taxonomy () {
-    $singular = 'Player';
-    $plural   = 'Players';
 
-    register_taxonomy(
-        'players',
-        array( 'collection' ),
-        array(
-            'labels' => array(
-                'name' => __( $plural ),
-                'singular_name' => __( $singular ),
-                'search_items' => __( 'Search '.$plural ),
-                'popular_items' => __( 'Popular '.$plural ),
-                'all_items' => __( 'All '.$plural ),
-                'parent_item' => __( 'Parent '.$singular ),
-                'parent_item_colon' => __( 'Parent '.$singular.':' ),
-                'edit_item' => __( 'Edit '.$singular ),
-                'update_item' => __( 'Update '.$singular ),
-                'add_new_item' => __( 'Add New '.$singular ),
-                'new_item_name' => __( 'New '.$singular ),
-            ),
-            'public' => true,
-            'show_in_nav_menus' => true,
-            'show_ui' => true,
-            'hierarchical' => true,
-            'query_var' => true,
-            'rewrite' => array( 'slug' => 'players', 'with_front' => false ),
-        )
-    );
+    $bgg_prefix = wp_cache_get('bgg_prefix');
+    $data_choices = wp_cache_get('data_choices');
+
+    if( $data_choices["{$bgg_prefix}_data_player"]['value'] == 'on' ):
+
+        $singular = 'Player';
+        $plural   = 'Players';
+
+        register_taxonomy(
+            'players',
+            array( 'collection' ),
+            array(
+                'labels' => array(
+                    'name' => __( 'Player Count' ),
+                    'singular_name' => __( $singular ),
+                    'search_items' => __( 'Search '.$plural ),
+                    'popular_items' => __( 'Popular '.$plural ),
+                    'all_items' => __( 'All '.$plural ),
+                    'parent_item' => __( 'Parent '.$singular ),
+                    'parent_item_colon' => __( 'Parent '.$singular.':' ),
+                    'edit_item' => __( 'Edit '.$singular ),
+                    'update_item' => __( 'Update '.$singular ),
+                    'add_new_item' => __( 'Add New '.$singular ),
+                    'new_item_name' => __( 'New '.$singular ),
+                ),
+                'public' => true,
+                'show_in_nav_menus' => true,
+                'show_ui' => true,
+                'hierarchical' => true,
+                'query_var' => true,
+                'rewrite' => array( 'slug' => 'players', 'with_front' => false ),
+            )
+        );
+    endif;
 }
 
 add_action('init', 'bgg_collection_players_taxonomy');
@@ -95,34 +104,40 @@ add_action('init', 'bgg_collection_players_taxonomy');
  * @since 1.0.0
  */
 function bgg_collection_published_taxonomy () {
-    $singular = 'Year';
-    $plural   = 'Years';
 
-    register_taxonomy(
-        'published',
-        array( 'collection' ),
-        array(
-            'labels' => array(
-                'name' => __( $plural ),
-                'singular_name' => __( $singular ),
-                'search_items' => __( 'Search '.$plural ),
-                'popular_items' => __( 'Popular '.$plural ),
-                'all_items' => __( 'All '.$plural ),
-                'parent_item' => __( 'Parent '.$singular ),
-                'parent_item_colon' => __( 'Parent '.$singular.':' ),
-                'edit_item' => __( 'Edit '.$singular ),
-                'update_item' => __( 'Update '.$singular ),
-                'add_new_item' => __( 'Add New '.$singular ),
-                'new_item_name' => __( 'New '.$singular ),
-            ),
-            'public' => true,
-            'show_in_nav_menus' => true,
-            'show_ui' => true,
-            'hierarchical' => true,
-            'query_var' => true,
-            'rewrite' => array( 'slug' => 'published', 'with_front' => false ),
-        )
-    );
+    $bgg_prefix = wp_cache_get('bgg_prefix');
+    $data_choices = wp_cache_get('data_choices');
+
+    if( $data_choices["{$bgg_prefix}_data_year"]['value'] == 'on' ):
+        $singular = 'Year';
+        $plural   = 'Years';
+
+        register_taxonomy(
+            'published',
+            array( 'collection' ),
+            array(
+                'labels' => array(
+                    'name' => __( 'Year Published' ),
+                    'singular_name' => __( $singular ),
+                    'search_items' => __( 'Search '.$plural ),
+                    'popular_items' => __( 'Popular '.$plural ),
+                    'all_items' => __( 'All '.$plural ),
+                    'parent_item' => __( 'Parent '.$singular ),
+                    'parent_item_colon' => __( 'Parent '.$singular.':' ),
+                    'edit_item' => __( 'Edit '.$singular ),
+                    'update_item' => __( 'Update '.$singular ),
+                    'add_new_item' => __( 'Add New '.$singular ),
+                    'new_item_name' => __( 'New '.$singular ),
+                ),
+                'public' => true,
+                'show_in_nav_menus' => true,
+                'show_ui' => true,
+                'hierarchical' => true,
+                'query_var' => true,
+                'rewrite' => array( 'slug' => 'published', 'with_front' => false ),
+            )
+        );
+    endif;
 }
 
 add_action('init', 'bgg_collection_published_taxonomy');
@@ -155,13 +170,30 @@ add_filter( 'pre_get_posts', 'bgg_collection_admin_order' );
  */
 function bgg_collection_define_columns( $columns ) {
 
-    $columns['cb']          = '<input type="checkbox" />';
-    $columns['year']        = __('<span style="font-size: 85%"><i class="dashicons dashicons-calendar-alt"></i> Published</span>');
-    $columns['avg_rating']  = __('<span style="font-size: 85%">Rating (Avg)</span>');
-    $columns['per_rating']  = __('<span style="font-size: 85%">Rating (Personal)</span>');
-    $columns['rank']        = __('<span style="font-size: 85%">Rank</span>');
-    $columns['playingtime'] = __('<span style="font-size: 85%"><i class="dashicons dashicons-clock"></i> Length (mins)</span>');
-    $columns['players']     = __('<span style="font-size: 85%"><i class="dashicons dashicons-admin-users"></i> Players</span>');
+    $bgg_prefix   = wp_cache_get('bgg_prefix');
+    $data_choices = wp_cache_get('data_choices');
+
+    $columns['cb'] = '<input type="checkbox" />';
+
+    if( $data_choices["{$bgg_prefix}_data_rating_avg"]['value'] == 'on' ):
+        $columns['avg_rating']  = __('<span style="font-size: 85%">Rating (Avg)</span>');
+    endif;
+    if( $data_choices["{$bgg_prefix}_data_rating_per"]['value'] == 'on' ):
+        $columns['per_rating']  = __('<span style="font-size: 85%">Rating (Personal)</span>');
+    endif;
+    if( $data_choices["{$bgg_prefix}_data_rank"]['value'] == 'on' ):
+        $columns['rank']  = __('<span style="font-size: 85%"><i class="dashicons dashicons-awards"></i> Rank</span>');
+    endif;
+    if( $data_choices["{$bgg_prefix}_data_length"]['value'] == 'on' ):
+        $columns['playingtime']  = __('<span style="font-size: 85%"><i class="dashicons dashicons-clock"></i> Length (mins)</span>');
+    endif;
+    if( $data_choices["{$bgg_prefix}_data_year"]['value'] == 'on' ):
+        $columns['year'] = __('<span style="font-size: 85%"><i class="dashicons dashicons-calendar-alt"></i> Published</span>');
+    endif;
+    if( $data_choices["{$bgg_prefix}_data_player"]['value'] == 'on' ):
+        $columns['players'] = __('<span style="font-size: 85%"><i class="dashicons dashicons-admin-users"></i> Players</span>');
+    endif;
+
     $columns['bgg_link']    = __('<span style="font-size: 85%">BGG Link</span>');
     unset($columns['date']);
 
@@ -184,7 +216,9 @@ function bgg_collection_fill_columns( $column_name, $id ) {
 
             $avg_rating = get_post_meta($post->ID, 'avg_rating', true);
 
-            echo number_format($avg_rating, 1);
+            if( $avg_rating ):
+                echo number_format($avg_rating, 1);
+            endif;
         break;
         case 'per_rating':
 

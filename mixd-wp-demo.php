@@ -12,13 +12,13 @@
  * @wordpress-plugin
  * Plugin Name:       BGG Collection
  * Plugin URI:        https://github.com/mixd
- * Description:       This is an example of a WordPress Plugin
+ * Description:       Import a user's boardgame collection from boardgamegeek.com
  * Version:           1.0.0
  * Author:            thecodezombie
  * Author URI:        http://thecodezombie.co.uk
  * License:           GPLv3
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
- * Text Domain:       mixd-wp-demo
+ * Text Domain:       http://thecodezombie.co.uk
 */
 
 
@@ -29,6 +29,16 @@
 if ( !defined( 'WPINC' ) ) { die; }
 
 
+/**
+ * Define the naming prefix
+ *
+ * @since 1.0.0
+ * @return string
+ */
+function bgg_collection_var_prefix() {
+    wp_cache_set( 'bgg_prefix', 'bgg_collection' );
+}
+add_action('init', 'bgg_collection_var_prefix');
 
 /**
  * Load the Mixd Plugin foundation
@@ -48,8 +58,6 @@ require_once( 'bgg_collection-foundation.php' );
 function bgg_collection_title() {
     return __("Boardgamegeek Collection", "bgg-collection");
 }
-
-
 
 /**
  * Define a short description to display in the plugin's admin Page

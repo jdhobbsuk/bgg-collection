@@ -4,9 +4,12 @@
  *
  */
 
-$username = (get_option('bgg_username')) ? sanitize_text_field( get_option('bgg_username') ) : '';
-$bgg_url  = 'https://www.boardgamegeek.com/xmlapi2/collection?username='.$username.'&stats=1';
+$data_choices   = wp_cache_get('data_choices');
+$filter_choices = wp_cache_get('filter_choices');
+$layout_choices = wp_cache_get('layout_choices');
 
+$username = (get_option('bgg_collection_username')) ? sanitize_text_field( get_option('bgg_collection_username') ) : '';
+$bgg_url  = 'https://www.boardgamegeek.com/xmlapi2/collection?username='.$username.'&stats=1';
 $xml = simplexml_load_file( $bgg_url );
 
 // set defaults
@@ -79,31 +82,33 @@ if( !empty( $xml ) ):
             $exist_check = $wpdb->get_results("SELECT * FROM $wpdb->postmeta WHERE meta_key = 'bgg_id' AND meta_value = ".$bgg_id." LIMIT 1", ARRAY_A);
 
             // generate player terms
-            if( $min_player && $max_player ):
+            if( $data_choices['bgg_collection_data_player']['value'] == 'on' ):
                 $players = array();
 
-                for($i = $min_player; $i <= $max_player; $i++):
-                    $term_check = term_exists( $i, 'players' );
+                if( $min_player && $max_player ):
+                    for($i = $min_player; $i <= $max_player; $i++):
+                        $term_check = term_exists( $i, 'players' );
 
-                    if( $term_check === 0 || $term_check === NULL ):
-                        $term_title = $i.' Players';
-                        if( $i == 1 ):
-                            $term_title = 'Solo'; 
+                        if( $term_check === 0 || $term_check === NULL ):
+                            $term_title = $i.' Players';
+                            if( $i == 1 ):
+                                $term_title = 'Solo'; 
+                            endif;
+
+                            $args = array(
+                                'slug' => $i
+                            );
+                            wp_insert_term( $term_title, 'players', $args );
                         endif;
 
-                        $args = array(
-                            'slug' => $i
-                        );
-                        wp_insert_term( $term_title, 'players', $args );
-                    endif;
-
-                    $term = get_term_by('slug', $i, 'players');
-                    $players[] = intval( $term->term_id );
-                endfor;
+                        $term = get_term_by('slug', $i, 'players', ARRAY_A);
+                        $players[] = intval( $term['term_id'] );
+                    endfor;
+                endif;
             endif;
 
             // generate years published
-            if( $year_published ):
+            if( $year_published && $data_choices['bgg_collection_data_year']['value'] == 'on' ):
                 $year_check = term_exists( $year_published, 'published' );
                 if( $year_check === 0 || $year_check === NULL ):
                     $args = array(
@@ -126,17 +131,21 @@ if( !empty( $xml ) ):
 
                 // meta
                     // average rating
-                    if( $avg_rating ):
+                    if( $avg_rating && $data_choices['bgg_collection_data_rating_avg']['value'] == 'on' ):
                         add_post_meta($post_id, 'avg_rating', $avg_rating);
+                    elseif( $data_choices['bgg_collection_data_rating_avg']['value'] != 'on' ):
+                        delete_post_meta($post_id, 'avg_rating');
                     endif;
 
                     // personal rating
-                    if( $per_rating && $per_rating != 'N/A' ):
+                    if( ($per_rating && $per_rating != 'N/A') && $data_choices['bgg_collection_data_rating_per']['value'] == 'on' ):
                         add_post_meta($post_id, 'per_rating', number_format($per_rating, 1) );
+                    elseif( $data_choices['bgg_collection_data_rating_per']['value'] != 'on' ):
+                        delete_post_meta($post_id, 'per_rating' );
                     endif;
 
                     // playing time
-                    if( $playingtime ):
+                    if( $playingtime && $data_choices['bgg_collection_data_rating_per']['value'] == 'on' ):
                         add_post_meta($post_id, 'playingtime', $playingtime);
                     endif;
 
@@ -157,13 +166,17 @@ if( !empty( $xml ) ):
 
                 //meta
                     // average rating
-                    if( $avg_rating ):
+                    if( $avg_rating && $data_choices['bgg_collection_data_rating_avg']['value'] == 'on' ):
                         update_post_meta($post_id, 'avg_rating', $avg_rating);
+                    elseif( $data_choices['bgg_collection_data_rating_avg']['value'] != 'on' ):
+                        update_post_meta($post_id, 'avg_rating', null);
                     endif;
 
                     // personal rating
-                    if( $per_rating && $per_rating != 'N/A' ):
+                    if( ($per_rating && $per_rating != 'N/A') && $data_choices['bgg_collection_data_rating_per']['value'] == 'on' ):
                         update_post_meta($post_id, 'per_rating', number_format($per_rating, 1) );
+                    elseif( $data_choices['bgg_collection_data_rating_per']['value'] != 'on' ):
+                        update_post_meta($post_id, 'per_rating', null);
                     endif;
 
                     // playing time
@@ -180,17 +193,28 @@ if( !empty( $xml ) ):
                 $games_updated++;
             endif;
 
+
             // add player choices
-            if( !empty($players) ):
+            if( !empty($players) && $data_choices['bgg_collection_data_player']['value'] == 'on' ):
                 wp_set_object_terms( $post_id, $players, 'players' );
             endif;
 
             // add year published
-            if( $year_published ):
+            if( $year_published && $data_choices['bgg_collection_data_year']['value'] == 'on' ):
                 wp_set_object_terms( $post_id, $year_published, 'published' );
             endif;
 
         endforeach;
+
+        $players = get_terms( 'players', array( 'hide_empty' => true) );
+        if( !empty($players) && $data_choices['bgg_collection_data_player']['value'] == 'on' ):
+            foreach($players as $player):
+                $term_id   = $player->term_id;
+                $term_slug = $player->slug;
+
+                add_term_meta($term_id, 'player_count', intval($term_slug), true);
+            endforeach;
+        endif;
 
         // success message
         if($games_added > 0 || $games_updated > 0):
