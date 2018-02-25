@@ -5,30 +5,20 @@
  * @since 1.0.0
  */
 
-$root     = (get_option('bgg_collection_root')) ? sanitize_text_field( get_option('bgg_collection_root') ) : '';
-
-// filter choices
-$filters_player = (get_option('bgg_collection_filter_player')) ? sanitize_text_field( get_option('bgg_collection_filter_player') ) : 'off';
-$filters_year = (get_option('bgg_collection_filter_year')) ? sanitize_text_field( get_option('bgg_collection_filter_year') ) : 'off';
+$bgg_prefix     = wp_cache_get('bgg_prefix');
+$data_choices   = wp_cache_get('data_choices');
+$filter_choices = wp_cache_get('filter_choices');
+$layout_choices = wp_cache_get('layout_choices');
 
 $filters = array();
 
-if($filters_player == 'on'):
-	$filters[] = array(
-	    'label'    => 'Number of players',
-	    'name'     => 'filter_players',
-	    'taxonomy' => 'players',
-	    'type'     => 'checkbox'
-	);
-endif;
-
-if($filters_year == 'on'):
-	$filters[] = array(
-	    'label'    => 'Year published',
-	    'name'     => 'filter_year',
-	    'taxonomy' => 'published',
-	    'type'     => 'select'
-	);
+if($filter_choices["{$bgg_prefix}_filter_player"]['value'] == 'on'):
+	// $filters[] = array(
+	//     'label'    => 'Number of players',
+	//     'name'     => 'filter_players',
+	//     'taxonomy' => 'players',
+	//     'type'     => 'slider'
+	// );
 endif;
 
 
@@ -37,6 +27,9 @@ endif;
 	<form action="<?php the_permalink( $root ); ?>#filter" method="GET" role="search" id="filter">
 		<fieldset>
 			<ul>
+				<li>
+					
+				</li>
 				<?php foreach( $filters as $filter ): ?>
 	                <?php
 	                    $current = (isset($_GET[ $filter['name'] ])) ? $_GET[ $filter['name'] ] : '';

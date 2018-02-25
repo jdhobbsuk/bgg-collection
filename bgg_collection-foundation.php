@@ -131,3 +131,10 @@ if ( !function_exists( 'bgg_collection_menu_styles' ) ) {
  * @since 1.0.0
  */
 require_once( plugin_dir_path(__FILE__) . 'settings.php' );
+
+/**
+ * Generates the custom post type and taxonomies
+ *
+ * @since 1.0.0
+ */
+require_once( plugin_dir_path(__FILE__) . 'public/shortcode.php' );

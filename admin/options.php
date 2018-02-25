@@ -15,6 +15,13 @@
     if( $username && $sync ):
         require_once( plugin_dir_path(__FILE__) . 'sync.php' );
     endif;
+
+    // flush permalinks anytime settings are changed
+    if( isset( $_GET['settings-updated'] ) ):
+        flush_rewrite_rules( true );
+    endif;
+
+
 ?>
 
 <section id="introduction" class="wrap about-description">
@@ -81,6 +88,7 @@
                             'id'       => 'bgg_collection_root',
                             'name'     => 'bgg_collection_root',
                             'selected' => $layout_choices['bgg_collection_root'],
+                            'exclude'  => array( get_option( 'page_on_front' ) )
                         );
 
                         wp_dropdown_pages( $args );

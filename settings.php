@@ -14,23 +14,32 @@
  */
 
 function bgg_collection_games_cpt () {
+    $bgg_prefix     = wp_cache_get('bgg_prefix');
+    $layout_choices = wp_cache_get('layout_choices');
+
+    if( $layout_choices["{$bgg_prefix}_root"] && $layout_choices["{$bgg_prefix}_root"] == get_option( 'page_on_front' ) ):
+        $url = rtrim( str_replace( home_url(), '', get_permalink( $layout_choices["{$bgg_prefix}_root"] ) ), '/');
+    else:
+        $url = 'collection';
+    endif;
+
     $singular = 'Game';
     $plural   = 'Games';
 
     register_post_type(
         'collection',
         array(
-            'public' => false,
+            'public' => true,
             'show_ui' => true,
             'capability_type' => 'page',
             'hierarchical' => false,
-            'publicly_queryable' => false,
+            'publicly_queryable' => true,
             'exclude_from_search' => false,
-            'menu_position' => 5,
+            'menu_position' => 4,
             'menu_icon' => 'dashicons-layout',
             'query_var' => true,
-            'rewrite' => array( 'slug' => 'examples', 'with_front' => false ),
-            'supports' => array( 'title', 'page-attributes', 'revisions' ),
+            'rewrite' => array( 'slug' => $url, 'with_front' => false ),
+            'supports' => array( 'title', 'page-attributes', 'revisions', 'editor' ),
             'labels' => array(
                 'name' => __( $plural ),
                 'singular_name' => __( $singular ),
@@ -47,7 +56,6 @@ function bgg_collection_games_cpt () {
             )
         )
     );
-
 }
 
 add_action('init', 'bgg_collection_games_cpt');
